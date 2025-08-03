@@ -4,6 +4,14 @@ WebCrawler is a web vulnerability scanner designed for security assessments. It 
 
 ---
 
+# 🌐 Live Deployment
+
+The application is deployed via Render and accessible through:
+
+🔗 URL: https://webcrawler-9k2d.onrender.com/
+
+---
+
 ## 🔧 Features
 
 * 🌐 URL crawler with configurable page limits
