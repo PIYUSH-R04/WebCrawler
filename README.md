@@ -1,4 +1,4 @@
-# 🕷️ WebCrawler - Advanced Web Vulnerability Scanner
+# 🕷️ WebCrawler - Web Vulnerability Scanner
 
 WebCrawler is a web vulnerability scanner designed for security assessments. It performs deep, multi-layered scans including HTTP header checks, outdated software detection, insecure form analysis, and CVE lookups.
 
