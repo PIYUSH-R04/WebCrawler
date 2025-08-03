@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebScanCrawler — Start Scan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom right, #0f172a, #1e293b);
+      color: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #1e293b;
+      padding: 40px 30px;
+      border-radius: 15px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      color: #38bdf8;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: none;
+      border-radius: 6px;
+      background-color: #334155;
+      color: #f1f5f9;
+      font-size: 14px;
+    }
+
+    input[type="file"] {
+      padding: 8px;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 8px;
+    }
+
+    .checkbox-group {
+      margin-top: 10px;
+    }
+
+    .checkbox-group label {
+      font-weight: normal;
+      display: block;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .checkbox-group label:hover {
+      color: #7dd3fc;
+    }
+
+    button {
+      margin-top: 30px;
+      width: 100%;
+      padding: 12px;
+      background-color: #38bdf8;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #0ea5e9;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>WebScanCrawler 🔍</h1>
+
+  <form id="scanForm" action="/scan/start" method="POST" enctype="multipart/form-data" autocomplete="off">
+    <label for="url">🌐 Target URL:</label>
+    <input type="text" name="url" required>
+
+    <label>📄 Upload Software Versions (.txt):</label>
+    <input type="file" name="version_file" accept=".txt">
+
+    <label>🔁 Max Pages (default 15):</label>
+    <input type="number" name="max_pages" min="1" max="100" value="15">
+
+    <label>⏱ Timeout (in seconds):</label>
+    <input type="number" name="timeout" min="10" max="600" value="60">
+
+    <label>
+      <input type="checkbox" name="respect_robots"> 🤖 Respect robots.txt
+    </label>
+
+    <label>🧪 Select Modules:</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="modules" value="headers" checked> HTTP Headers</label>
+      <label><input type="checkbox" name="modules" value="outdated" checked> Outdated Software</label>
+      <label><input type="checkbox" name="modules" value="forms" checked> Form Issues</label>
+      <label><input type="checkbox" name="modules" value="cve" checked> CVE Lookup</label>
+    </div>
+
+    <button type="submit">🚀 Start Scan</button>
+  </form>
+
+  <div class="footer-note">Piyush R • 2025</div>
+</div>
+
+<script>
+  window.onload = function () {
+    document.getElementById("scanForm").reset();
+  };
+</script>
+
+</body>
+</html>

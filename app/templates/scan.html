@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebScanCrawler - Scan In Progress</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 30%;
+      background-color: #1e293b;
+      padding: 20px;
+      box-shadow: 2px 0 10px #00000033;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .main-panel {
+      width: 70%;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    h2 {
+      color: #38bdf8;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 5px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    li {
+      padding: 6px 0;
+      border-bottom: 1px dashed #475569;
+    }
+
+    button, select {
+      background-color: #38bdf8;
+      color: #0f172a;
+      font-weight: bold;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #64748b;
+      cursor: not-allowed;
+    }
+
+    pre {
+      background: #0f172a;
+      border: 1px solid #334155;
+      padding: 10px;
+      border-radius: 6px;
+      color: #e2e8f0;
+      height: 85%;
+      overflow-y: auto;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .download-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer {
+      margin-top: auto;
+    }
+
+    .back-link {
+      text-decoration: none;
+      font-size: 14px;
+      color: #94a3b8;
+      margin-top: 10px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div>
+      <h2>Scan Tasks</h2>
+      <ul id="taskList">
+        <li data-module="headers">Headers: ⏳</li>
+        <li data-module="outdated">Outdated Software: ⏳</li>
+        <li data-module="forms">Forms: ⏳</li>
+        <li data-module="cve">CVE Lookup: ⏳</li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      <div class="button-row">
+        <button id="abortBtn" onclick="abortScan()">❌ Abort</button>
+        <div class="download-group">
+          <button id="downloadBtn" disabled>⬇️ Download</button>
+          <select id="formatSelect" disabled>
+            <option value="md">.md</option>
+            <option value="html">.html</option>
+          </select>
+        </div>
+      </div>
+      <a href="/" class="back-link">← Back to Home</a>
+    </div>
+  </div>
+
+  <!-- Main Panel -->
+  <div class="main-panel">
+    <h2>Live Scan Report</h2>
+    <pre id="logOutput">Scan will begin shortly...</pre>
+  </div>
+</div>
+
+<script>
+const scanId = new URLSearchParams(window.location.search).get("scan_id");
+let poller = null;
+let scanComplete = false;
+
+function enableDownloadButtons() {
+  const downloadBtn = document.getElementById("downloadBtn");
+  const formatSelect = document.getElementById("formatSelect");
+
+  downloadBtn.disabled = false;
+  formatSelect.disabled = false;
+
+  downloadBtn.onclick = () => {
+    const format = formatSelect.value;
+    window.open(`/report/${scanId}?format=${format}`, "_blank");
+  };
+}
+
+function pollScan() {
+  fetch(`/scan/status/${scanId}`)
+    .then(res => res.json())
+    .then(data => {
+      let done = true;
+      for (const [module, status] of Object.entries(data.status)) {
+        const li = document.querySelector(`#taskList li[data-module="${module}"]`);
+        if (li) {
+          li.innerHTML = `${module.charAt(0).toUpperCase() + module.slice(1)}: ${
+            status === "done" ? "✅" : status === "failed" ? "❌" :
+            status === "aborted" ? "🛑" : "⏳"}`;
+        }
+        if (status === "pending" || status === "running") {
+          done = false;
+        }
+      }
+
+      document.getElementById("logOutput").innerText = data.log.join("\n");
+
+      if (data.aborted || done) {
+        clearInterval(poller);
+        scanComplete = true;
+        enableDownloadButtons();
+      }
+    });
+}
+
+function abortScan() {
+  fetch(`/scan/abort/${scanId}`, { method: "POST" })
+    .then(() => {
+      clearInterval(poller); // Immediately stop polling
+      document.getElementById("abortBtn").disabled = true;
+      document.getElementById("logOutput").innerText += "\n[!] Scan aborted by user.";
+    });
+}
+
+poller = setInterval(pollScan, 2000);
+</script>
+
+</body>
+</html>
